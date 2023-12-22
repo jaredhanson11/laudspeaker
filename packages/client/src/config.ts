@@ -6,19 +6,24 @@ export const POSTHOG_HOST_KEY = "posthog_host";
 export const WS_BASE_URL_KEY = "ws_base_url";
 export const JOURNEY_ONBOARDING_KEY = "journey_onboarding";
 export const ONBOARDING_API_KEY_KEY = "onboarding_api_key";
+export const SENTRY_DSN_KEY = "sentry_dsn";
+
 type ConfigKey =
   | typeof API_BASE_URL_KEY
   | typeof POSTHOG_KEY_KEY
   | typeof POSTHOG_HOST_KEY
   | typeof WS_BASE_URL_KEY
   | typeof JOURNEY_ONBOARDING_KEY
-  | typeof ONBOARDING_API_KEY_KEY;
+  | typeof ONBOARDING_API_KEY_KEY
+  | typeof SENTRY_DSN_KEY;
 
 class Config {
   appConfig: { [key: string]: any };
 
   defaultConfig: { [key: string]: any } = {
     [POSTHOG_KEY_KEY]: "",
+    [SENTRY_DSN_KEY]:
+      "https://b151929668e6f01274f48e3b91721adf@o4506038702964736.ingest.sentry.io/4506437206802432",
   };
 
   constructor() {

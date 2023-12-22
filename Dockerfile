@@ -2,21 +2,26 @@
 # To run: docker run -it -p 80:80 --env-file packages/server/.env --rm laudspeaker/laudspeaker:latest
 FROM node:16 as frontend_build
 ARG EXTERNAL_URL
-ARG FRONTEND_SENTRY_AUTH_TOKEN
 ARG REACT_APP_POSTHOG_HOST
 ARG REACT_APP_POSTHOG_KEY
 ARG REACT_APP_ONBOARDING_API_KEY
-ENV SENTRY_AUTH_TOKEN=${FRONTEND_SENTRY_AUTH_TOKEN}
+ARG SENTRY_AUTH_TOKEN
+
+ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+ENV SENTRY_ORG ${SENTRY_ORG:-laudspeaker-rb}
+ENV SENTRY_PROJECT ${SENTRY_PROJECT:-javascript-react-jared-test}
+
 ENV REACT_APP_WS_BASE_URL=${EXTERNAL_URL}
 ENV REACT_APP_POSTHOG_HOST=${REACT_APP_POSTHOG_HOST}
 ENV REACT_APP_POSTHOG_KEY=${REACT_APP_POSTHOG_KEY}
 ENV REACT_APP_ONBOARDING_API_KEY=${REACT_APP_ONBOARDING_API_KEY}
+
 WORKDIR /app
+
 COPY ./packages/client/package.json /app/
 COPY ./package-lock.json /app/
 RUN npm install --legacy-peer-deps
 COPY . /app
-RUN npm run format:client
 RUN npm run build:client
 
 FROM node:16 as backend_build

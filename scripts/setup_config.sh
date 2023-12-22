@@ -32,5 +32,10 @@ if [[ -z "$ONBOARDING_API_KEY" ]]; then
 fi
 echo "window.appConfig.onboarding_api_key =\"$ONBOARDING_API_KEY\"" >>$OUTPUT
 
+
+if [[ ! -z "$SENTRY_DSN" ]]; then
+    echo "window.appConfig.sentry_dsn=\"$SENTRY_DSN\"" >>$OUTPUT
+fi
+
 echo "Final config.js file"
 cat $OUTPUT

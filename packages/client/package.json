@@ -136,14 +136,13 @@
     "start": "env-cmd -f .env node scripts/start.js",
     "start:ci": "node scripts/start.js",
     "build:staging": "env-cmd --silent -f .env.staging node scripts/build.js",
-    "build:prod": "env-cmd --silent -f .env.prod node scripts/build.js && npm run sentry:sourcemaps",
+    "build:prod": "env-cmd --silent -f .env.prod node scripts/build.js",
     "test": "node scripts/test.js --passWithNoTests",
     "test:e2e": "npx cypress run",
     "npm run test:components": "",
     "cypress:open": "cypress open",
     "format": "prettier --write src/**/*.ts{,x}",
-    "lint": "tsc --noEmit && eslint src/**/*.ts{,x}",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org laudspeaker-rb --project javascript-react ./build && sentry-cli sourcemaps upload --org laudspeaker-rb --project javascript-react ./build"
+    "lint": "tsc --noEmit && eslint src/**/*.ts{,x}"
   },
   "eslintConfig": {
     "extends": [
@@ -165,6 +164,7 @@
   },
   "devDependencies": {
     "@4tw/cypress-drag-drop": "^2.2.1",
+    "@sentry/webpack-plugin": "^2.10.2",
     "@types/d3-hierarchy": "^3.1.2",
     "@types/lodash": "^4.14.184",
     "@types/papaparse": "^5.3.7",
