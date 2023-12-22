@@ -25,8 +25,12 @@ COPY . /app
 RUN npm run build:client
 
 FROM node:16 as backend_build
-ARG BACKEND_SENTRY_AUTH_TOKEN
-ENV SENTRY_AUTH_TOKEN=${BACKEND_SENTRY_AUTH_TOKEN}
+
+ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+ENV SENTRY_ORG ${SENTRY_ORG:-laudspeaker-rb}
+ENV SENTRY_PROJECT ${SENTRY_PROJECT:-javascript-react-jared-test}
+
+
 WORKDIR /app
 COPY --from=frontend_build /app/packages/client/package.json /app/
 COPY ./packages/server/package.json /app

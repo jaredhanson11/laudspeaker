@@ -112,6 +112,8 @@ export class AuthController {
   @Post('login')
   @UseInterceptors(ClassSerializerInterceptor, new RavenInterceptor())
   public async login(@Body() body: LoginDto) {
+    let test = true;
+    if (test) throw Error();
     const session = randomUUID();
     this.debug(`Logging in: ${JSON.stringify(body)}`, this.login.name, session);
     try {

@@ -11,7 +11,7 @@ import * as Sentry from '@sentry/node';
 import { ProfilingIntegration } from '@sentry/profiling-node';
 
 Sentry.init({
-  dsn: 'https://15c7f142467b67973258e7cfaf814500@o4506038702964736.ingest.sentry.io/4506040630640640',
+  dsn: 'https://9a3434c23da8ff1e8cd7118f68e3e85d@o4506038702964736.ingest.sentry.io/4506438314950656',
   integrations: [new ProfilingIntegration()],
   // Performance Monitoring
   tracesSampleRate: 1.0, // Capture 100% of the transactions, reduce in production!
