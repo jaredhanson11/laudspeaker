@@ -59,6 +59,8 @@ workflows:
               only:
                 - jared/cypress
       - push:
+          requires:
+            - build
           filters:
             branches:
               only:
