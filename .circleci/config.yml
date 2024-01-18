@@ -51,8 +51,8 @@ jobs:
             docker push ${IMAGE_NAME}:latest
             docker push ${IMAGE_NAME}:${IMAGE_TAG}
   test:
-    docker:
-      - image: cimg/base:stable
+    machine:
+      image: ubuntu-2004:202010-01
     steps:
       - setup_remote_docker
       - checkout
@@ -69,7 +69,7 @@ jobs:
           name: "Setup docker compose environment with running app"
           command: |
             export LAUDSPEAKER_IMAGE=laudspeaker/laudspeaker
-            docker compose --profile testing up
+            docker compose --profile testing up --quiet-pull
       - run:
           name: "Run cypress tests"
           command: |
