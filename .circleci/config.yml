@@ -54,13 +54,9 @@ jobs:
     machine:
       image: ubuntu-2004:202010-01
     steps:
-      - setup_remote_docker
       - checkout
       # - attach_workspace:
       #     at: .
-      # - setup_remote_docker:
-      #     version: 20.10.18
-      #     docker_layer_caching: false
       # - run:
       #     name: Load built image
       #     command: |
