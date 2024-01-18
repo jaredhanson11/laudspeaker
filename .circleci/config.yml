@@ -55,21 +55,25 @@ jobs:
       image: ubuntu-2004:current
     steps:
       - checkout
-      - attach_workspace:
-          at: .
-      - run:
-          name: Load built image
-          command: |
-            docker image load < "images/laudspeaker"
+      # - attach_workspace:
+      #     at: .
+      # - run:
+      #     name: Load built image
+      #     command: |
+      #       docker image load < "images/laudspeaker"
       - run:
           name: "Setup docker compose environment with running app"
           command: |
-            export LAUDSPEAKER_IMAGE=laudspeaker
+            export LAUDSPEAKER_IMAGE=laudspeaker/laudspeaker
             docker compose --profile testing up --wait --quiet-pull
+      - run:
+          name: "Install cypress dependencies"
+          command: |
+            npm install -w packages/tests
       - run:
           name: "Run cypress tests"
           command: |
-            TESTS_BASE_URL=http://localhost:8080 TESTS_API_BASE_URL=http://localhost:8080/api npm run test:e2e:client
+            TESTS_BASE_URL=http://localhost:8080 TESTS_API_BASE_URL=http://localhost:8080/api npm run tests:run
 
   deploy_staging:
     docker:
@@ -86,29 +90,29 @@ jobs:
 workflows:
   build_and_push_staging:
     jobs:
-      - build:
-          filters:
-            branches:
-              only:
-                - jared/cypress
+      # - build:
+      #     filters:
+      #       branches:
+      #         only:
+      #           - jared/cypress
       - test:
-          requires:
-            - build
+          # requires:
+          #   - build
           filters:
             branches:
               only:
                 - jared/cypress
-      - push:
-          requires:
-            - test
-          filters:
-            branches:
-              only:
-                - jared/cypress
-      - deploy_staging:
-          requires:
-            - push
-          filters:
-            branches:
-              only:
-                - jared/cypress-never-gethere
+      # - push:
+      #     requires:
+      #       - test
+      #     filters:
+      #       branches:
+      #         only:
+      #           - jared/cypress
+      # - deploy_staging:
+      #     requires:
+      #       - push
+      #     filters:
+      #       branches:
+      #         only:
+      #           - jared/cypress-never-gethere
