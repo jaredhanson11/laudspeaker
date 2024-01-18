@@ -69,7 +69,7 @@ jobs:
           name: "Setup docker compose environment with running app"
           command: |
             export LAUDSPEAKER_IMAGE=laudspeaker/laudspeaker
-            docker compose --profile testing up --wait
+            docker compose --profile testing up
       - run:
           name: "Run cypress tests"
           command: |
