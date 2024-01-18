@@ -76,7 +76,7 @@ jobs:
             TESTS_BASE_URL=http://localhost:8080 TESTS_API_BASE_URL=http://localhost:8080/api npm run tests:run
       - store_test_results:
           name: "Save cypress test results"
-          path: ./packages/tests/cypress/test-results/results.xml
+          path: ./packages/tests/cypress/test-results/
       - store_artifacts:
           name: "Save cypress test videos"
           path: ./packages/tests/cypress/videos/
