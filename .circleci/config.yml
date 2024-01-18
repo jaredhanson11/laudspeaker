@@ -52,7 +52,7 @@ jobs:
             docker push ${IMAGE_NAME}:${IMAGE_TAG}
   test:
     machine:
-      image: ubuntu-2004:202010-01
+      image: ubuntu-2004:current
     steps:
       - checkout
       # - attach_workspace:
