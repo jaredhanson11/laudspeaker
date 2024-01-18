@@ -95,13 +95,15 @@ workflows:
               only:
                 - jared/cypress
       - test:
+          requires:
+            - build
           filters:
             branches:
               only:
                 - jared/cypress
       - push:
           requires:
-            - build
+            - test
           filters:
             branches:
               only:
@@ -109,7 +111,6 @@ workflows:
       - deploy_staging:
           requires:
             - push
-            - test
           filters:
             branches:
               only:
