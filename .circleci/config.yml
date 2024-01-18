@@ -54,6 +54,7 @@ jobs:
     docker:
       - image: cimg/base:stable
     steps:
+      - setup_remote_docker
       - checkout
       # - attach_workspace:
       #     at: .
