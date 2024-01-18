@@ -55,19 +55,19 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - attach_workspace:
-          at: .
-      - setup_remote_docker:
-          version: 20.10.18
-          docker_layer_caching: false
-      - run:
-          name: Load built image
-          command: |
-            docker image load < "images/laudspeaker"
+      # - attach_workspace:
+      #     at: .
+      # - setup_remote_docker:
+      #     version: 20.10.18
+      #     docker_layer_caching: false
+      # - run:
+      #     name: Load built image
+      #     command: |
+      #       docker image load < "images/laudspeaker"
       - run:
           name: "Setup docker compose environment with running app"
           command: |
-            export LAUDSPEAKER_IMAGE=laudspeaker
+            export LAUDSPEAKER_IMAGE=laudspeaker/laudspeaker
             docker compose --profile testing up --wait
       - run:
           name: "Run cypress tests"
@@ -89,11 +89,11 @@ jobs:
 workflows:
   build_and_push_staging:
     jobs:
-      - build:
-          filters:
-            branches:
-              only:
-                - jared/cypress
+      # - build:
+      #     filters:
+      #       branches:
+      #         only:
+      #           - jared/cypress
       - test:
           requires:
             - build
@@ -101,17 +101,17 @@ workflows:
             branches:
               only:
                 - jared/cypress
-      - push:
-          requires:
-            - test
-          filters:
-            branches:
-              only:
-                - jared/cypress
-      - deploy_staging:
-          requires:
-            - push
-          filters:
-            branches:
-              only:
-                - jared/cypress-never-gethere
+      # - push:
+      #     requires:
+      #       - test
+      #     filters:
+      #       branches:
+      #         only:
+      #           - jared/cypress
+      # - deploy_staging:
+      #     requires:
+      #       - push
+      #     filters:
+      #       branches:
+      #         only:
+      #           - jared/cypress-never-gethere
