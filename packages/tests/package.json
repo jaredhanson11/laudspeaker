@@ -4,7 +4,7 @@
   "description": "Cypress tests",
   "main": "index.js",
   "scripts": {
-    "cypress:run": "npx cypress run --reporter junit --reporter-options mochaFile=./cypress/test-results/results.xml,toConsole=true"
+    "cypress:run": "npx cypress run --reporter junit --reporter-options mochaFile=./cypress/test-results/results-[hash].xml,toConsole=true"
   },
   "keywords": [],
   "private": true,
