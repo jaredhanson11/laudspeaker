@@ -50,10 +50,51 @@ jobs:
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push ${IMAGE_NAME}:latest
             docker push ${IMAGE_NAME}:${IMAGE_TAG}
+  test:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - setup_remote_docker:
+          version: 20.10.18
+          docker_layer_caching: false
+      - run:
+          name: Load built image
+          command: |
+            docker image load < "images/laudspeaker"
+      - run:
+          name: "Setup docker compose environment with running app"
+          command: |
+            export LAUDSPEAKER_IMAGE=laudspeaker
+            docker compose up --profile testing --wait --wait-timeout 200
+      - run:
+          name: "Run cypress tests"
+          command: |
+            TESTS_BASE_URL=http://localhost:8080 TESTS_API_BASE_URL=http://localhost:8080/api npm run test:e2e:client
+
+  deploy_staging:
+    docker:
+      - image: cimg/aws:2023.12
+    steps:
+      - run:
+          name: "Force new deployment"
+          command: |
+            export AWS_ACCESS_KEY_ID=$DEMO_AWS_KEY
+            export AWS_SECRET_ACCESS_KEY=$DEMO_AWS_SECRET
+            aws configure set region $DEMO_AWS_REGION
+            aws ecs update-service --cluster staging --service staging --force-new-deployment
+
 workflows:
   build_and_push_staging:
     jobs:
       - build:
+          filters:
+            branches:
+              only:
+                - jared/cypress
+      - test:
           filters:
             branches:
               only:
@@ -65,3 +106,11 @@ workflows:
             branches:
               only:
                 - jared/cypress
+      - deploy_staging:
+          requires:
+            - push
+            - test
+          filters:
+            branches:
+              only:
+                - jared/cypress-never-gethere
