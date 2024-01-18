@@ -95,8 +95,8 @@ workflows:
       #         only:
       #           - jared/cypress
       - test:
-          requires:
-            - build
+          # requires:
+          #   - build
           filters:
             branches:
               only:
