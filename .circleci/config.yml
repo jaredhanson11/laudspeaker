@@ -74,6 +74,12 @@ jobs:
           name: "Run cypress tests"
           command: |
             TESTS_BASE_URL=http://localhost:8080 TESTS_API_BASE_URL=http://localhost:8080/api npm run tests:run
+      - store_test_results:
+          name: "Save cypress test results"
+          path: ./packages/tests/cypress/test-results/results.xml
+      - store_artifacts:
+          name: "Save cypress test videos"
+          path: ./packages/tests/cypress/videos/
 
   deploy_staging:
     docker:
