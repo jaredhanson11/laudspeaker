@@ -12,12 +12,14 @@ jobs:
       dockerfile: Dockerfile
       output: laudspeaker
       external_url: app-staging.laudspeaker.com
-  # test-staging:
+    # test-staging:
+    # needs: build-staging
   #   name: Test docker image
   #   uses: ./.github/workflows/test.yml
   #   with:
   #     input: laudspeaker
   push-staging:
+    needs: build-staging
     name: Tag and push docker images
     uses: ./.github/workflows/push.yml
     with:
