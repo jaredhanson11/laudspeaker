@@ -6,6 +6,6 @@ on:
 jobs:
   test:
     name: Test
-    uses: ./.github/workflows/actions/test.yml
+    uses: ./.github/workflows/test.yml
     with:
       image: laudspeaker/laudspeaker
