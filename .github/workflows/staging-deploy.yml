@@ -12,16 +12,15 @@ jobs:
       dockerfile: Dockerfile
       output: laudspeaker
       external_url: app-staging.laudspeaker.com
-      # # - name: Test docker image
-      # #   uses: ./.github/workflows/test.yml
-      # #   with:
-      # #     input: laudspeaker
-      # - name: Get shortened SHA
-      #   run: |
-      #     export $SHORT_SHA="${${{ github.sha }}:0:20}"
-      # - name: Tag and push docker images
-      #   uses: ./.github/workflows/push.yml
-      #   with:
-      #     input: laudspeaker
-      #     tags: jaredhanson11/laudspeaker:latest,jaredhanson11/laudspeaker:${{ env.SHORT_SHA }}
-      #   secrets: inherit
+  # test-staging:
+  #   name: Test docker image
+  #   uses: ./.github/workflows/test.yml
+  #   with:
+  #     input: laudspeaker
+  push-staging:
+    name: Tag and push docker images
+    uses: ./.github/workflows/push.yml
+    with:
+      input: laudspeaker
+      tags: jaredhanson11/laudspeaker:latest # ,jaredhanson11/laudspeaker:${{ env.SHORT_SHA }}
+    secrets: inherit
