@@ -7,7 +7,7 @@ on:
         default: Dockerfile
         required: true
         type: string # dockerfile name (likely Dockerfile, Dockerfile.prod.client, Dockerfile.prod.client)
-      ouput:
+      output:
         description: Name of the docker image that will be saved as an artifact
         default: laudspeaker
         required: true
