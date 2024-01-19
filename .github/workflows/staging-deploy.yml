@@ -1,0 +1,29 @@
+name: Build, test, push, deploy staging on commit
+on:
+  push:
+    branches:
+      - jared/cypress
+jobs:
+  staging:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build docker image
+        uses: ./.github/workflows/build.yml
+        secrets: inherit
+        with:
+          input: Dockerfile
+          output: laudspeaker
+          external_url: app-staging.laudspeaker.com
+      # - name: Test docker image
+      #   uses: ./.github/workflows/test.yml
+      #   with:
+      #     input: laudspeaker
+      - name: Get shortened SHA
+        run: |
+          export $SHORT_SHA="${${{ github.sha }}:0:20}"
+      - name: Tag and push docker images
+        uses: ./.github/workflows/push.yml
+        with:
+          input: laudspeaker
+          tags: jaredhanson11/laudspeaker:latest,jaredhanson11/laudspeaker:${{ env.SHORT_SHA }}
+        secrets: inherit
