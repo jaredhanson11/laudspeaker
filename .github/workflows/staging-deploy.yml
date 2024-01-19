@@ -4,12 +4,21 @@ on:
     branches:
       - jared/cypress
 jobs:
+  setup:
+    name: Setup variables
+    runs-on: ubuntu-latest
+    outputs:
+      short_sha: ${{ steps.short_sha.outputs.short_sha }}
+    steps:
+      - id: short_sha
+        run: echo "short_sha=${${{ github.sha }}:0:20}" >> "$GITHUB_OUTPUT"
   build-staging:
+    needs: [setup]
     name: Build docker image
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.ghtest
       output: laudspeaker
       external_url: app-staging.laudspeaker.com
     # test-staging:
@@ -19,10 +28,10 @@ jobs:
   #   with:
   #     input: laudspeaker
   push-staging:
-    needs: build-staging
+    needs: [setup, build-staging]
     name: Tag and push docker images
     uses: ./.github/workflows/push.yml
     with:
       input: laudspeaker
-      tags: jaredhanson11/laudspeaker:latest # ,jaredhanson11/laudspeaker:${{ env.SHORT_SHA }}
+      tags: jaredhanson11/laudspeaker:latest,jaredhanson11/laudspeaker:${{ needs.setup.outputs.short_sha }}
     secrets: inherit
