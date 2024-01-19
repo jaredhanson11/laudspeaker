@@ -11,7 +11,9 @@ jobs:
       short_sha: ${{ steps.short_sha.outputs.short_sha }}
     steps:
       - id: short_sha
-        run: echo "short_sha=${${{ github.sha }}:0:20}" >> "$GITHUB_OUTPUT"
+        run: |
+          SHA=${{ github.sha }} 
+          echo short_sha=${SHA:0:20} >> "$GITHUB_OUTPUT"
   build-staging:
     needs: [setup]
     name: Build docker image
