@@ -17,23 +17,23 @@ jobs:
   build-staging:
     needs: [setup]
     name: Build docker image
-    uses: ./.github/workflows/build.yml
+    uses: ./.github/workflows/actions/build.yml
     secrets: inherit
     with:
       dockerfile: Dockerfile.ghtest
       output: laudspeaker
       external_url: app-staging.laudspeaker.com
-    # test-staging:
-    # needs: build-staging
-  #   name: Test docker image
-  #   uses: ./.github/workflows/test.yml
-  #   with:
-  #     input: laudspeaker
-  push-staging:
+  test-staging:
     needs: [setup, build-staging]
-    name: Tag and push docker images
-    uses: ./.github/workflows/push.yml
+    name: Test docker image
+    uses: ./.github/workflows/actions/test.yml
     with:
-      input: laudspeaker
+      image: laudspeaker
+  push-staging:
+    needs: [setup, test-staging]
+    name: Tag and push docker images
+    uses: ./.github/workflows/actions/push.yml
+    with:
+      image: laudspeaker
       tags: jaredhanson11/laudspeaker:latest,jaredhanson11/laudspeaker:${{ needs.setup.outputs.short_sha }}
     secrets: inherit

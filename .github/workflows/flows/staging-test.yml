@@ -1,0 +1,11 @@
+name: Build, test, push, deploy staging on commit
+on:
+  push:
+    branches:
+      - jared/cypress
+jobs:
+  test:
+    name: Test
+    uses: ./.github/workflows/actions/test.yml
+    with:
+      image: laudspeaker/laudspeaker
