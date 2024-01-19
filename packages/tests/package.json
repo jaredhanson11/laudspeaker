@@ -4,7 +4,7 @@
   "description": "Cypress tests",
   "main": "index.js",
   "scripts": {
-    "cypress:clean": "rm ./cypress/test-results/results*",
+    "cypress:clean": "rm -f ./cypress/test-results/results*",
     "cypress:run": "npm run cypress:clean && npx cypress run --reporter junit --reporter-options mochaFile=./cypress/test-results/results-[hash].xml,toConsole=true"
   },
   "keywords": [],
