@@ -1,4 +1,4 @@
-name: Run cypress test suite on given image
+name: Test
 on:
   workflow_call:
     inputs:
@@ -35,3 +35,45 @@ jobs:
       - name: Run cypress tests
         run: |
           TESTS_BASE_URL=http://localhost:8080 TESTS_API_BASE_URL=http://localhost:8080/api npm run tests:run
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v3
+        if: always() # always run even if the previous step fails
+        with:
+          name: junit-test-results
+          path: ./packages/tests/cypress/test-results/*.xml
+          retention-days: 5
+      - name: Upload Test Screen Recordings
+        uses: actions/upload-artifact@v3
+        if: always() # always run even if the previous step fails
+        with:
+          name: cypress-videos
+          path: ./packages/tests/cypress/videos/*
+          retention-days: 5
+
+---
+name: Reports
+on:
+  workflow_run:
+    workflows: [Test]
+    types: [completed]
+
+permissions:
+  checks: write
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download test results
+        id: download
+        uses: actions/download-artifact@v3
+        with:
+          name: junit-test-results
+          workflow: ${{ github.event.workflow.id }}
+          run_id: ${{ github.event.workflow_run.id }}
+          path: /tmp/test-results/
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        with:
+          commit: ${{github.event.workflow_run.head_sha}}
+          report_paths: /tmp/test-results/**.xml

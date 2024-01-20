@@ -1,4 +1,4 @@
-name: Push specified docker image
+name: Push
 on:
   workflow_call:
     inputs:

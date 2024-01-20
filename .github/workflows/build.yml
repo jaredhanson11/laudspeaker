@@ -1,4 +1,4 @@
-name: Build specified docker image
+name: Build
 on:
   workflow_call:
     inputs:
