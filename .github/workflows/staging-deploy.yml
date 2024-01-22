@@ -2,7 +2,7 @@ name: Build, test, push, deploy staging on commit
 on:
   push:
     branches:
-      - jared/cypress
+      - staging
 jobs:
   setup:
     name: Setup variables
@@ -20,7 +20,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
-      dockerfile: Dockerfile.ghtest
+      dockerfile: Dockerfile
       output: laudspeaker
       external_url: app-staging.laudspeaker.com
   test-staging:
@@ -36,4 +36,9 @@ jobs:
     with:
       image: laudspeaker
       tags: jaredhanson11/laudspeaker:latest,jaredhanson11/laudspeaker:${{ needs.setup.outputs.short_sha }}
+    secrets: inherit
+  deploy-staging:
+    needs: [setup, push-staging]
+    name: Redeploy staging
+    uses: ./.github/workflows/deploy.yml
     secrets: inherit
