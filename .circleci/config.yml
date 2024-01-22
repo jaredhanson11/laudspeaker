@@ -1,105 +1,124 @@
 version: 2.1
 jobs:
-  build_and_deploy_production:
+  build:
     docker:
-      - image: cimg/node:18.12
-    steps:
-      - save_cache:
-          key: v1-cache
-          paths:
-            - project/
-      - checkout
-      - setup_remote_docker:
-          version: 20.10.14
-          docker_layer_caching: false
-      - run:
-          command: |
-            sudo apt-get update
-            sudo apt-get upgrade
-            sudo apt-get install awscli
-            export AWS_ACCESS_KEY_ID=$DEMO_AWS_KEY
-            export AWS_SECRET_ACCESS_KEY=$DEMO_AWS_SECRET
-            aws configure set region $DEMO_AWS_REGION
-            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 427506656486.dkr.ecr.us-east-1.amazonaws.com
-            docker build -f Dockerfile.prod.client -t laudspeaker:latest .
-            docker build -f Dockerfile.prod.server -t laudspeaker:api-latest .
-            docker tag laudspeaker:api-latest 427506656486.dkr.ecr.us-east-1.amazonaws.com/laudspeaker:api-latest
-            docker tag laudspeaker:latest 427506656486.dkr.ecr.us-east-1.amazonaws.com/laudspeaker:latest
-            docker push 427506656486.dkr.ecr.us-east-1.amazonaws.com/laudspeaker:api-latest
-            docker push 427506656486.dkr.ecr.us-east-1.amazonaws.com/laudspeaker:latest
-            aws ecs update-service --cluster ecs-demo --service api --force-new-deployment
-            aws ecs update-service --cluster frontend --service frontend --force-new-deployment
-
-  build_and_deploy_staging:
-    docker:
-      - image: circleci/node:16
-    steps:
-      - checkout
-      - setup_remote_docker:
-          version: 20.10.14
-          docker_layer_caching: false
-      - run:
-          command: |
-            sudo apt-get install -y python-pip libyaml-dev python-dev jq
-            sudo pip install awscli
-            export AWS_ACCESS_KEY_ID=$DEMO_AWS_KEY
-            export AWS_SECRET_ACCESS_KEY=$DEMO_AWS_SECRET
-            aws configure set region $DEMO_AWS_REGION
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
-            export DOCKER_TAG=${CIRCLE_SHA1:0:20}
-            docker build --build-arg="EXTERNAL_URL=$EXTERNAL_URL" --build-arg="FRONTEND_SENTRY_AUTH_TOKEN=$FRONTEND_SENTRY_AUTH_TOKEN" --build-arg="BACKEND_SENTRY_AUTH_TOKEN=$BACKEND_SENTRY_AUTH_TOKEN" --build-arg="REACT_APP_POSTHOG_HOST=$REACT_APP_POSTHOG_HOST" --build-arg="REACT_APP_POSTHOG_KEY=$REACT_APP_POSTHOG_KEY" --build-arg="REACT_APP_ONBOARDING_API_KEY=$REACT_APP_ONBOARDING_API_KEY" -f Dockerfile -t laudspeaker/laudspeaker:latest -t laudspeaker/laudspeaker:$DOCKER_TAG .
-            docker push laudspeaker/laudspeaker:latest
-            docker push laudspeaker/laudspeaker:$DOCKER_TAG
-            aws ecs update-service --cluster staging --service staging --force-new-deployment
-  test:
-    docker:
-      - image: circleci/node:16
-        environment:
-          TERM: xterm
-
+      - image: cimg/base:stable
     steps:
       - checkout
       - setup_remote_docker:
           version: 20.10.18
-          docker_layer_caching: true
-      - run: npm install --legacy-peer-deps
-      - run: docker build -f Dockerfile.dev.client -t laudspeaker:latest .
-      - run: docker build -f Dockerfile.dev.server -t laudspeaker:api-latest .
-      - run: sudo apt-get update
-      - run: sudo apt-get install --fix-missing libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
-      - run: docker-compose -f ./docker-compose.dev.yml up --abort-on-container-exit
-      # - run: sleep 60
-      # - run: docker ps
-      # - run: cd packages/client && npm run test:e2e
+          docker_layer_caching: false
+      - run:
+          name: Build image
+          command: |
+            docker build -t laudspeaker --build-arg="EXTERNAL_URL=$EXTERNAL_URL" --build-arg="FRONTEND_SENTRY_AUTH_TOKEN=$FRONTEND_SENTRY_AUTH_TOKEN" --build-arg="BACKEND_SENTRY_AUTH_TOKEN=$BACKEND_SENTRY_AUTH_TOKEN" --build-arg="REACT_APP_POSTHOG_HOST=$REACT_APP_POSTHOG_HOST" --build-arg="REACT_APP_POSTHOG_KEY=$REACT_APP_POSTHOG_KEY" --build-arg="REACT_APP_ONBOARDING_API_KEY=$REACT_APP_ONBOARDING_API_KEY" -f Dockerfile .
+      - run:
+          name: Save image as tar
+          command: |
+            mkdir -p images
+            docker image save -o "images/laudspeaker" "laudspeaker"
+      - persist_to_workspace:
+          root: .
+          paths:
+            - images
+  push:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - attach_workspace:
+          at: .
+      - setup_remote_docker:
+          version: 20.10.18
+          docker_layer_caching: false
+      - run: # https://circleci.com/docs/env-vars/#example-configuration-of-environment-variables
+          name: "Setup custom environment variables"
+          command: |
+            echo 'export IMAGE_NAME="jaredhanson11/laudspeaker-test"' >> "$BASH_ENV"
+            echo 'export IMAGE_TAG="${CIRCLE_SHA1:0:20}"' >> "$BASH_ENV"
+      - run:
+          name: Load image
+          command: |
+            docker image load < "images/laudspeaker"
+      - run:
+          name: Tag image with appropriate tags
+          command: |
+            docker image tag laudspeaker ${IMAGE_NAME}:${IMAGE_TAG}
+            docker image tag laudspeaker ${IMAGE_NAME}:latest
+      - run:
+          name: Push tagged images
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push ${IMAGE_NAME}:latest
+            docker push ${IMAGE_NAME}:${IMAGE_TAG}
+  test:
+    machine:
+      image: ubuntu-2004:current
+    steps:
+      - checkout
+      # - attach_workspace:
+      #     at: .
+      # - run:
+      #     name: Load built image
+      #     command: |
+      #       docker image load < "images/laudspeaker"
+      - run:
+          name: "Setup docker compose environment with running app"
+          command: |
+            export LAUDSPEAKER_IMAGE=laudspeaker/laudspeaker
+            docker compose --profile testing up --wait --quiet-pull
+      - run:
+          name: "Install cypress dependencies"
+          command: |
+            npm install -w packages/tests
+      - run:
+          name: "Run cypress tests"
+          command: |
+            TESTS_BASE_URL=http://localhost:8080 TESTS_API_BASE_URL=http://localhost:8080/api npm run tests:run
+      - store_test_results:
+          name: "Save cypress test results"
+          path: ./packages/tests/cypress/test-results/
+      - store_artifacts:
+          name: "Save cypress test videos"
+          path: ./packages/tests/cypress/videos/
+
+  deploy_staging:
+    docker:
+      - image: cimg/aws:2023.12
+    steps:
+      - run:
+          name: "Force new deployment"
+          command: |
+            export AWS_ACCESS_KEY_ID=$DEMO_AWS_KEY
+            export AWS_SECRET_ACCESS_KEY=$DEMO_AWS_SECRET
+            aws configure set region $DEMO_AWS_REGION
+            aws ecs update-service --cluster staging --service staging --force-new-deployment
+
 workflows:
-  pull_request:
+  build_and_push_staging:
     jobs:
-      - test
-      # - cypress/run:
-      #     pre-steps:
-      #       - checkout
-      #       - setup_remote_docker:
-      #           version: 20.10.14
-      #           docker_layer_caching: true
-      #       - run: docker build -f Dockerfile.dev.server -t laudspeaker:api-latest .
-      #       - run: docker-compose -f ./docker-compose.dev.yml up -d
-      #       - run: sudo apt-get update
-      #       - run: sudo apt-get install --fix-missing libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
-      #     start: npm run start:client:ci
-      #     wait-on: 'http://localhost:3000'
-      #     command: npm run test:e2e:client
-      #     executor: base16
-  staging:
-    jobs:
-      - build_and_deploy_staging:
+      # - build:
+      #     filters:
+      #       branches:
+      #         only:
+      #           - jared/cypress
+      - test:
+          # requires:
+          #   - build
           filters:
             branches:
               only:
-                - staging
-  production:
-    jobs:
-      - build_and_deploy_production:
-          filters:
-            branches:
-              only:
-                - production
+                - jared/cypress
+      # - push:
+      #     requires:
+      #       - test
+      #     filters:
+      #       branches:
+      #         only:
+      #           - jared/cypress
+      # - deploy_staging:
+      #     requires:
+      #       - push
+      #     filters:
+      #       branches:
+      #         only:
+      #           - jared/cypress-never-gethere
