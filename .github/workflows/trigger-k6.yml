@@ -25,7 +25,7 @@ jobs:
       - name: Run k6 local test
         uses: grafana/k6-action@v0.3.1
         with:
-          filename: ./packages/tests/k6/1_million_test.js
+          filename: ./packages/tests/k6/customer_messages_test.js
           flags: --quiet
         env:
           BASE_URL: ${{ inputs.endpoint }}
