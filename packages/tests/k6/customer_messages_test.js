@@ -22,7 +22,9 @@ export default function main() {
 
   let reporter = new Reporter("SETUP");
   reporter.addTimer("totalElapsed", "Total elapsed time of k6 test");
-  reporter.report(`Started script with email: ${EMAIL} and file ${FILE_PATH}.`);
+  reporter.report(
+    `Started script with email: ${EMAIL} and file ${__ENV.CSV_FILEPATH}.`
+  );
 
   reporter.setStep("CREATE_ACCOUNT");
   reporter.addTimer("createAccount", "Elapsed time of create account");
