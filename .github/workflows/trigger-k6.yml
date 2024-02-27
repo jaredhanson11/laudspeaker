@@ -1,0 +1,32 @@
+name: Trigger perf test
+on:
+  workflow_dispatch:
+    inputs:
+      endpoint:
+        description: Endpoint url
+        type: string
+        required: true
+        default: https://perf.laudspeaker.com
+      csv:
+        description: CSV url
+        type: string
+        required: true
+
+jobs:
+  trigger-perf-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download csv
+        run: |
+          mkdir /tmp/
+          curl ${{ inputs.csv }} -o /tmp/test.csv
+      - name: Run k6 local test
+        uses: grafana/k6-action@v0.3.1
+        with:
+          filename: ./packages/tests/k6/1_million_test.js
+          flags: --quiet
+        env:
+          BASE_URL: ${{ inputs.endpoint }}
+          CSV_FILEPATH: /tmp/test.csv
