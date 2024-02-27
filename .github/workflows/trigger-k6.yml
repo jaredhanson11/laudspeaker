@@ -7,14 +7,19 @@ on:
         type: string
         required: true
         default: https://perf.laudspeaker.com
-      csv:
-        description: CSV url
-        type: string
+      test_size:
+        description: Test size (# of customers)
+        type: choice
         required: true
-      num_customers:
-        description: Number of customers importing
-        type: number
-        required: true
+        default: "1000"
+        options:
+          - "100"
+          - "1000"
+          - "10000"
+          - "50000"
+          - "100000"
+          - "500000"
+          - "1000000"
 
 jobs:
   trigger-perf-test:
@@ -22,13 +27,55 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - uses: kanga333/variable-mapper@master
+        name: Setup params
+        id: params
+        with:
+          key: "${{ inputs.test_size }}"
+          map: |
+            {
+              "100": {
+                  "CSV_URL": "https://testtachyontest123.s3.us-west-1.amazonaws.com/perf-folder/perf-100.csv",
+                  "NUM_CUSTOMERS": "100",
+                  "POLLING_MINUTES": ".1"
+              },
+              "1000": {
+                  "CSV_URL": "https://testtachyontest123.s3.us-west-1.amazonaws.com/perf-folder/perf-1000.csv",
+                  "NUM_CUSTOMERS": "1000",
+                  "POLLING_MINUTES": ".5"
+              },
+              "10000": {
+                  "CSV_URL": "https://testtachyontest123.s3.us-west-1.amazonaws.com/perf-folder/perf-10000.csv",
+                  "NUM_CUSTOMERS": "10000"
+              },
+              "50000": {
+                  "CSV_URL": "https://testtachyontest123.s3.us-west-1.amazonaws.com/perf-folder/perf-50000.csv",
+                  "NUM_CUSTOMERS": "50000"
+              },
+              "100000": {
+                  "CSV_URL": "https://testtachyontest123.s3.us-west-1.amazonaws.com/perf-folder/perf-100000.csv",
+                  "NUM_CUSTOMERS": "100000"
+              },
+              "500000": {
+                  "CSV_URL": "https://testtachyontest123.s3.us-west-1.amazonaws.com/perf-folder/perf-500000.csv",
+                  "NUM_CUSTOMERS": "500000"
+              },
+              "1000000": {
+                  "CSV_URL": "https://testtachyontest123.s3.us-west-1.amazonaws.com/perf-folder/perf-1000000.csv",
+                  "NUM_CUSTOMERS": "1000000"
+              },
+              ".*": {
+                  "POLLING_MINUTES": "1"
+              }
+            }
+          export_to: output
+          mode: fill
       - name: Download csv
         id: csv
         run: |
           export CSV_FILEPATH=${GITHUB_WORKSPACE}/test.csv
           echo "CSV_FILEPATH=${CSV_FILEPATH}" >> "$GITHUB_OUTPUT"
-          curl ${{ inputs.csv }} -o ${CSV_FILEPATH}
-          ls ${GITHUB_WORKESPACE}
+          curl ${{ steps.params.outputs.CSV_URL }} -o ${CSV_FILEPATH}
       - name: Run k6 local test
         uses: grafana/k6-action@v0.3.1
         with:
@@ -37,4 +84,5 @@ jobs:
         env:
           BASE_URL: ${{ inputs.endpoint }}
           CSV_FILEPATH: ${{ steps.csv.outputs.CSV_FILEPATH }}
-          NUM_CUSTOMERS: ${{ inputs.num_customers }}
+          NUM_CUSTOMERS: ${{ steps.params.outputs.NUM_CUSTOMERS }}
+          POLLING_MINUTES: ${{ steps.params.outputs.POLLING_MINUTES }}

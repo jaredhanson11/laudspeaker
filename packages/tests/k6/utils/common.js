@@ -58,6 +58,41 @@ export function checkTimer(startDate) {
   )}`;
 }
 
+export class HttpxWrapper {
+  constructor(session) {
+    if (!session) {
+      throw Error("Needs httpx session to work");
+    }
+    this.session = session;
+  }
+  getOrFail(url, params = undefined) {
+    let response = this.session.get(url, params);
+    failOnError(response);
+    return response;
+  }
+  postOrFail(url, body = undefined, params = undefined) {
+    let response = this.session.post(url, body, params);
+    failOnError(response);
+    return response;
+  }
+
+  putOrFail(url, body = undefined, params = undefined) {
+    let response = this.session.put(url, body, params);
+    failOnError(response);
+    return response;
+  }
+  patchOrFail(url, body = undefined, params = undefined) {
+    let response = this.session.patch(url, body, params);
+    failOnError(response);
+    return response;
+  }
+  deleteOrFail(url, body = undefined, params = undefined) {
+    let response = this.session.delete(url, body, params);
+    failOnError(response);
+    return response;
+  }
+}
+
 export function failOnError(response) {
   if (
     !check(response, {
@@ -67,28 +102,4 @@ export function failOnError(response) {
   ) {
     fail(`${response.url} failed due to ${response.status}.`);
   }
-}
-
-export function getOrFail(url, params = undefined) {
-  let response = http.get(url, params);
-  failOnError(response);
-  return response;
-}
-
-export function postOrFail(url, body = undefined, params = undefined) {
-  let response = http.post(url, body, params);
-  failOnError(response);
-  return response;
-}
-
-export function putOrFail(url, body = undefined, params = undefined) {
-  let response = http.put(url, body, params);
-  failOnError(response);
-  return response;
-}
-
-export function patchOrFail(url, body = undefined, params = undefined) {
-  let response = http.patch(url, body, params);
-  failOnError(response);
-  return response;
 }
