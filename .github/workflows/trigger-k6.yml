@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Download csv
         run: |
-          curl ${{ inputs.csv }} -o /tmp/test.csv
+          curl ${{ inputs.csv }} -o $HOME/test.csv
       - name: Run k6 local test
         uses: grafana/k6-action@v0.3.1
         with:
@@ -28,4 +28,4 @@ jobs:
           flags: --quiet
         env:
           BASE_URL: ${{ inputs.endpoint }}
-          CSV_FILEPATH: /tmp/test.csv
+          CSV_FILEPATH: $HOME/test.csv
