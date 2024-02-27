@@ -21,6 +21,7 @@ jobs:
       - name: Download csv
         id: csv
         run: |
+          env
           export CSV_FILEPATH=${GITHUB_WORKESPACE}/test.csv
           echo "CSV_FILEPATH=${CSV_FILEPATH}" >> "$GITHUB_OUTPUT"
           curl ${{ inputs.csv }} -o ${CSV_FILEPATH}
