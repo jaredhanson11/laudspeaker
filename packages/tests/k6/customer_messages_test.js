@@ -7,13 +7,18 @@ import {
   getOrFail,
   postOrFail,
   patchOrFail,
-  putOrFail,
   Reporter,
 } from "./utils/common.js";
 
 export const options = {
-  vus: 1,
-  iterations: 1,
+  scenarios: {
+    upload_and_send: {
+      executor: "per-vu-iterations",
+      vus: 1,
+      iterations: 1,
+      maxDuration: "2h",
+    },
+  },
 };
 
 const customersImported = new Counter("customers_imported");
@@ -342,8 +347,9 @@ export default function main() {
         reporter.report(
           `Sent count hasn't increased in 5 retries. Failing test...`
         );
-        fail();
-        break;
+        fail(
+          `Message customers has failed after ${sentCount} messages sent, but ${NUM_CUSTOMERS} messages expected.`
+        );
       }
       retries = retries + 1;
     } else {
