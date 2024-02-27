@@ -19,9 +19,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Download csv
+        id: csv
         run: |
-          curl ${{ inputs.csv }} -o ${{ env.GITHUB_WORKSPACE }}/test.csv
-          ls ${{ env.GITHUB_WORKSPACE }}
+          export CSV_FILEPATH=${GITHUB_WORKESPACE}/test.csv
+          echo "CSV_FILEPATH=${CSV_FILEPATH}" >> "$GITHUB_OUTPUT"
+          curl ${{ inputs.csv }} -o ${CSV_FILEPATH}
+          ls ${GITHUB_WORKESPACE}
       - name: Run k6 local test
         uses: grafana/k6-action@v0.3.1
         with:
@@ -29,4 +32,4 @@ jobs:
           flags: --quiet
         env:
           BASE_URL: ${{ inputs.endpoint }}
-          CSV_FILEPATH: ${{ env.GITHUB_WORKSPACE }}/test.csv
+          CSV_FILEPATH: ${{ steps.csv.outputs.CSV_FILEPATH }}
