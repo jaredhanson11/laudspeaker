@@ -71,7 +71,7 @@ export default function main() {
   reporter.log(`Creating customer attributes`);
   response = http.post(
     "https://perf.laudspeaker.com/api/customers/attributes/create",
-    '{"name":"${PRIMARY_KEY_HEADER}","type":"String"}',
+    `{"name":"${PRIMARY_KEY_HEADER}","type":"String"}`,
     {
       headers: {
         authorization,
