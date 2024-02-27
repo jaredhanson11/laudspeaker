@@ -1,4 +1,4 @@
-import { sleep } from "k6";
+import { sleep, fail } from "k6";
 import { uuidv4 } from "https://jslib.k6.io/k6-utils/1.4.0/index.js";
 import http from "k6/http";
 import { Counter } from "k6/metrics";
@@ -27,6 +27,7 @@ const EMAIL =
 const UPLOAD_FILE = open(__ENV.CSV_FILEPATH, "b");
 const POLLING_MINUTES = parseFloat(__ENV.POLLING_MINUTES) || 1;
 const PRIMARY_KEY_HEADER = "user_id";
+const NUM_CUSTOMERS = __ENV.NUM_CUSTOMERS || fail("NUM_CUSTOMERS required");
 
 export default function main() {
   let response;
@@ -104,7 +105,6 @@ export default function main() {
   //   }
   // );
 
-  const NUM_CUSTOMERS = 2000;
   reporter.log(`New customers: ${NUM_CUSTOMERS}`);
 
   reporter.report(`Starting import for fileKey: ${UPLOADED_FILE_KEY}`);

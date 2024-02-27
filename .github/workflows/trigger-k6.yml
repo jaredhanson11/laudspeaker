@@ -11,6 +11,10 @@ on:
         description: CSV url
         type: string
         required: true
+      num_customers:
+        description: Number of customers importing
+        type: number
+        required: true
 
 jobs:
   trigger-perf-test:
@@ -34,3 +38,4 @@ jobs:
         env:
           BASE_URL: ${{ inputs.endpoint }}
           CSV_FILEPATH: ${{ steps.csv.outputs.CSV_FILEPATH }}
+          NUM_CUSTOMERS: $${{ inputs.num_customers }}
