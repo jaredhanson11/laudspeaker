@@ -34,33 +34,33 @@ jobs:
           key: "${{ inputs.test_size }}"
           map: |
             {
-              "100": {
+              "^100$": {
                   "CSV_URL": "https://testtachyontest123.s3.us-west-1.amazonaws.com/perf-folder/perf-100.csv",
                   "NUM_CUSTOMERS": "100",
                   "POLLING_MINUTES": ".1"
               },
-              "1000": {
+              "^1000$": {
                   "CSV_URL": "https://testtachyontest123.s3.us-west-1.amazonaws.com/perf-folder/perf-1000.csv",
                   "NUM_CUSTOMERS": "1000",
                   "POLLING_MINUTES": ".5"
               },
-              "10000": {
+              "^10000$": {
                   "CSV_URL": "https://testtachyontest123.s3.us-west-1.amazonaws.com/perf-folder/perf-10000.csv",
                   "NUM_CUSTOMERS": "10000"
               },
-              "50000": {
+              "^50000$": {
                   "CSV_URL": "https://testtachyontest123.s3.us-west-1.amazonaws.com/perf-folder/perf-50000.csv",
                   "NUM_CUSTOMERS": "50000"
               },
-              "100000": {
+              "^100000$": {
                   "CSV_URL": "https://testtachyontest123.s3.us-west-1.amazonaws.com/perf-folder/perf-100000.csv",
                   "NUM_CUSTOMERS": "100000"
               },
-              "500000": {
+              "^500000$": {
                   "CSV_URL": "https://testtachyontest123.s3.us-west-1.amazonaws.com/perf-folder/perf-500000.csv",
                   "NUM_CUSTOMERS": "500000"
               },
-              "1000000": {
+              "^1000000$": {
                   "CSV_URL": "https://testtachyontest123.s3.us-west-1.amazonaws.com/perf-folder/perf-1000000.csv",
                   "NUM_CUSTOMERS": "1000000"
               },
