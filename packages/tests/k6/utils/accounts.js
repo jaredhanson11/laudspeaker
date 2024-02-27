@@ -1,6 +1,7 @@
 import http from "k6/http";
+import { postOrFail } from "./common.js";
 export function createAccount(email = undefined) {
-  let registerResponse = http.post(
+  let registerResponse = postOrFail(
     "https://perf.laudspeaker.com/api/auth/register",
     `{"firstName":"Test","lastName":"Test","email":"${email}","password":"Password1$"}`,
     {
@@ -10,10 +11,8 @@ export function createAccount(email = undefined) {
     }
   );
 
-  if (registerResponse.error_code) fail();
-
   let authorization = `Bearer ${registerResponse.json("access_token")}`;
-  let organizatonResponse = http.post(
+  let organizatonResponse = postOrFail(
     "https://perf.laudspeaker.com/api/organizations",
     '{"name":"Test","timezoneUTCOffset":"UTC-07:00"}',
     {

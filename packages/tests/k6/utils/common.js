@@ -1,3 +1,5 @@
+import { check, fail } from "k6";
+import http from "k6/http";
 export class Reporter {
   // state
   //   currentStep = undefined;
@@ -54,4 +56,39 @@ export function checkTimer(startDate) {
     2,
     "0"
   )}`;
+}
+
+export function failOnError(response) {
+  if (
+    !check(response, {
+      "response code was 2xx or 3xx": (response) =>
+        parseInt(response.status) >= 200 && parseInt(response.status) <= 399,
+    })
+  ) {
+    fail(`${response.url} failed due to ${response.status}.`);
+  }
+}
+
+export function getOrFail(url, params = undefined) {
+  let response = http.get(url, params);
+  failOnError(response);
+  return response;
+}
+
+export function postOrFail(url, body = undefined, params = undefined) {
+  let response = http.post(url, body, params);
+  failOnError(response);
+  return response;
+}
+
+export function putOrFail(url, body = undefined, params = undefined) {
+  let response = http.put(url, body, params);
+  failOnError(response);
+  return response;
+}
+
+export function patchOrFail(url, body = undefined, params = undefined) {
+  let response = http.patch(url, body, params);
+  failOnError(response);
+  return response;
 }
