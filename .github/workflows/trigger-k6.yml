@@ -68,7 +68,7 @@ jobs:
                   "POLLING_MINUTES": "1"
               }
             }
-          export_to: output
+          export_to: output,log
           mode: fill
       - name: Download csv
         id: csv
