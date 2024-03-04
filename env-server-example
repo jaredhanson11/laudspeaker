@@ -80,4 +80,4 @@ KAFKA_BROKERS_LIST=''
 
 # Mock message sending env variables
 # MOCK_MESSAGE_SEND=true
-# MOCK_MESSAGE_SEND_URL=http://mock-200-endpoint.com/endpoint
+# MOCK_MESSAGE_SEND_URL=http://ping-server

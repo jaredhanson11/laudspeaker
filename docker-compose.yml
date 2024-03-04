@@ -136,6 +136,21 @@ services:
       - /opt/bitnami/kafka/bin/connect-distributed.sh /opt/bitnami/kafka-connect/connect.properties
   #### END kafka connect related containers
 
+  ping-server:
+    image: jaredhanson11/ping-server:latest
+    container_name: ping-server
+    environment:
+      - PORT=80
+    healthcheck:
+      test: ["CMD", "curl", "localhost:80"]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+    ports:
+      - "80:80"
+    networks:
+      - laudspeaker_default
+
   init-environment:
     build:
       context: ./local-env/
