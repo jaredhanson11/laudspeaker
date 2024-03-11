@@ -35,7 +35,7 @@ jobs:
     uses: ./.github/workflows/push.yml
     with:
       image: laudspeaker
-      tags: laudspeaker/laudspeaker:latest,laudspeaker/laudspeaker:${{ needs.setup.outputs.short_sha }}
+      tags: jaredhanson11/laudspeaker:latest,jaredhanson11/laudspeaker:${{ needs.setup.outputs.short_sha }}
     secrets: inherit
   deploy-staging:
     needs: [setup, push-staging]
