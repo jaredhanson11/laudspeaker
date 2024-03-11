@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - staging
+      - jared/perf-deploy-branch
 jobs:
   setup:
     name: Setup variables
