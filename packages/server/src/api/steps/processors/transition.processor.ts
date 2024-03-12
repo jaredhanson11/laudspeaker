@@ -67,7 +67,7 @@ import { JourneyLocation } from '@/api/journeys/entities/journey-location.entity
   metrics: {
     maxDataPoints: MetricsTime.ONE_HOUR,
   },
-  concurrency: 20,
+  concurrency: 5,
 })
 export class TransitionProcessor extends WorkerHost {
   private phClient = new PostHog('RxdBl8vjdTwic7xTzoKTdbmeSC1PCzV6sw-x-FKSB-k');
