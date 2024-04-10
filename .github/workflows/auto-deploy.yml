@@ -47,7 +47,7 @@ jobs:
     uses: ./.github/workflows/push.yml
     with:
       image: laudspeaker
-      tags: laudspeaker/laudspeaker:${{ needs.setup.outputs.short_sha }}
+      tags: jaredhanson11/laudspeaker:${{ needs.setup.outputs.short_sha }}
     secrets: inherit
   push-latest:
     needs: [setup, test]
@@ -56,14 +56,14 @@ jobs:
     if: "github.github_ref_name == 'staging'"
     with:
       image: laudspeaker
-      tags: laudspeaker/laudspeaker:latest
+      tags: jaredhanson11/laudspeaker:latest
     secrets: inherit
   deploy:
     needs: [setup, push]
-    name: Redeploy staging
+    name: Redeploy environment
     uses: ./.github/workflows/deploy.yml
     with:
-      image-repository: laudspeaker/laudspeaker
+      image-repository: jaredhanson11/laudspeaker
       image-tag: ${{ needs.setup.outputs.short_sha }}
       env: ${{ needs.setup.outputs.env }}
     secrets: inherit
