@@ -42,7 +42,7 @@ jobs:
   #   with:
   #     image: laudspeaker
   push:
-    needs: [setup]
+    needs: [setup, build]
     name: Tag and push docker image
     uses: ./.github/workflows/push.yml
     with:
@@ -50,7 +50,7 @@ jobs:
       tags: jaredhanson11/laudspeaker:${{ needs.setup.outputs.short_sha }}
     secrets: inherit
   push-latest:
-    needs: [setup]
+    needs: [setup, build]
     name: "Tag and push 'latest' docker image"
     uses: ./.github/workflows/push.yml
     if: "github.github_ref_name == 'staging'"
