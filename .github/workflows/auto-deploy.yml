@@ -15,6 +15,7 @@ jobs:
     steps:
       - id: params
         run: |
+          SHA=${{ github.sha }}
           echo short_sha=${SHA:0:20} >> "$GITHUB_OUTPUT"
           BRANCH=${{ github.ref_name }}
           if [[ $BRANCH == "staging" ]]; then
@@ -25,7 +26,6 @@ jobs:
             echo env=prod >> "$GITHUB_OUTPUT"
             echo external_url=app.laudspeaker.com >> "$GITHUB_OUTPUT"
           fi
-
   build:
     needs: [setup]
     name: Build docker image
@@ -53,7 +53,7 @@ jobs:
     needs: [setup, test]
     name: "Tag and push 'latest' docker image"
     uses: ./.github/workflows/push.yml
-    if: "github.github_ref_name == 'staging'"
+    if: "github.ref_name == 'staging'"
     with:
       image: laudspeaker
       tags: laudspeaker/laudspeaker:latest
